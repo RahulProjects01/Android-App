@@ -1,0 +1,102 @@
+MainActivity.java (Single activity for the entire app)---->
+public class MainActivity extends AppCompatActivity {
+private static final int RC_SIGN_IN = 123;
+private GoogleSignInClient mGoogleSignInClient;
+private boolean isLoggedIn = false;
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.activity_main);
+GoogleSignInOptions gso = new
+GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+.requestEmail()
+.build();
+mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+isLoggedIn = checkLoggedInUser();
+if (!isLoggedIn) {
+showLoginScreen();
+} else {
+showNotesScreen();
+}
+}
+private boolean checkLoggedInUser() {
+return false; // Placeholder, replace with actual implementation
+}
+private void showLoginScreen() {
+}
+private void showNotesScreen() {
+getSupportFragmentManager().beginTransaction()
+.replace(R.id.fragment_container, new NotesFragment())
+.commit();
+}
+@Override
+protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+super.onActivityResult(requestCode, resultCode, data);
+if (requestCode == RC_SIGN_IN) {
+Task<GoogleSignInAccount> task =
+GoogleSignIn.getSignedInAccountFromIntent(data);
+handleSignInResult(task);
+}
+
+public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> {
+private List<String> notesList;
+public NotesAdapter(List<String> notesList) {
+this.notesList = notesList;
+}
+@NonNull
+@Override
+public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_note, parent,
+false);
+return new ViewHolder(view);
+}
+@Override
+public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+String note = notesList.get(position);
+holder.bind(note);
+}
+@Override
+public int getItemCount() {
+return notesList.size();
+}
+public static class ViewHolder extends RecyclerView.ViewHolder {
+private TextView txtNote;
+public ViewHolder(@NonNull View itemView) {
+super(itemView);
+txtNote = itemView.findViewById(R.id.txtNote);
+}
+public void bind(String note) {
+txtNote.setText(note);
+}
+}
+}
+-----------------------------------------------------------------------------------
+item_note.xml (Layout file for individual note item in RecyclerView)---->
+
+<TextView
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/txtNote"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:padding="16dp"/>
+-------------------------------------------------------------------------
+fragment_notes.xml (Layout file for NotesFragment)----->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+<RecyclerView
+android:id="@+id/recyclerView"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:padding="16dp"/>
+<Button
+android:id="@+id/btnAddNote"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Add Note"
+android:layout_alignParentBottom="true"
+android:layout_alignParentEnd="true"
+android:layout_margin="16dp"/>
+</RelativeLayout>
+---------------------------------------------------------------------------
